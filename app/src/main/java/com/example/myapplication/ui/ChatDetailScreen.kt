@@ -57,7 +57,14 @@ fun ChatDetailScreen(
     var showReactionPicker by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
     val listState = rememberLazyListState()
-    
+
+    // ── Per-chat mutable message list (fix #1 + #2) ──
+    val messages = remember(chat.id) {
+        mutableStateListOf<Message>().also { list ->
+            list.addAll(MockData.messagesByChatId[chat.id] ?: emptyList())
+        }
+    }
+
     // Simulate typing indicator
     LaunchedEffect(Unit) {
         while (true) {
@@ -68,13 +75,23 @@ fun ChatDetailScreen(
             delay(10000)
         }
     }
-    
-    // Group messages by date
-    val messageGroups = remember(MockData.messages) {
-        listOf(
-            MessageGroup("Today", MockData.messages)
-        )
+
+    // Auto-scroll to bottom on open (fix #3)
+    LaunchedEffect(chat.id) {
+        if (messages.isNotEmpty()) {
+            listState.scrollToItem(messages.size - 1)
+        }
     }
+
+    // Auto-scroll to bottom when messages grow (after send)
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size - 1)
+        }
+    }
+
+    // Group messages under a single "Today" header
+    val messageGroups = listOf(MessageGroup("Today", messages))
 
     val reactionEmojis = listOf("❤️", "😂", "😮", "😢", "👍", "👎")
 
@@ -265,10 +282,20 @@ fun ChatDetailScreen(
                         )
                         
                         FloatingActionButton(
-                            onClick = { 
+                            onClick = {
                                 if (messageText.isNotBlank()) {
                                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    messageText = "" 
+                                    val newMsg = Message(
+                                        id = "msg_${System.currentTimeMillis()}",
+                                        senderId = "me",
+                                        text = messageText.trim(),
+                                        timestamp = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
+                                            .format(java.util.Date()),
+                                        isFromMe = true,
+                                        isRead = false
+                                    )
+                                    messages.add(newMsg)
+                                    messageText = ""
                                 }
                             },
                             modifier = Modifier

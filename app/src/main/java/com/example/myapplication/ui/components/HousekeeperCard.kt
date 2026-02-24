@@ -325,7 +325,7 @@ private fun FavoriteButton(
             .size(44.dp)
             .scale(scale)
             .background(
-                color = Color.White.copy(alpha = 0.9f),
+                color = Color.Black.copy(alpha = 0.35f),
                 shape = CircleShape
             )
             .shadow(4.dp, CircleShape)
@@ -333,7 +333,7 @@ private fun FavoriteButton(
         Icon(
             imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
             contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-            tint = if (isFavorite) ErrorRed else Grey600,
+            tint = if (isFavorite) ErrorRed else Color.White,
             modifier = Modifier.size(24.dp)
         )
     }

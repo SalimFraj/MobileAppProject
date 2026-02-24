@@ -150,12 +150,27 @@ object MockData {
         Chat("c3", "Carol White", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop", "Thank you for the wonderful review! 😊", "2 days ago", 0, isOnline = true)
     )
 
-    val messages = listOf(
-        Message("m1", "1", "Hi Alice, are you available tomorrow?", "09:00 AM", true, isRead = true),
-        Message("m2", "1", "Yes, I am! What time works for you?", "09:15 AM", false, isRead = true),
-        Message("m3", "1", "10 AM would be perfect.", "09:30 AM", true, isRead = true),
-        Message("m4", "1", "See you at 10 AM tomorrow!", "09:45 AM", false, isRead = true)
+    val messagesByChatId = mapOf(
+        "c1" to listOf(
+            Message("m1", "c1", "Hi Alice, are you available tomorrow?", "09:00 AM", true, isRead = true),
+            Message("m2", "c1", "Yes, I am! What time works for you?", "09:15 AM", false, isRead = true),
+            Message("m3", "c1", "10 AM would be perfect.", "09:30 AM", true, isRead = true),
+            Message("m4", "c1", "See you at 10 AM tomorrow! 😊", "09:45 AM", false, isRead = true)
+        ),
+        "c2" to listOf(
+            Message("m5", "c2", "Hi Bob, I wanted to check the booking details.", "Yesterday 10:00 AM", true, isRead = true),
+            Message("m6", "c2", "Sure! I'll be doing standard cleaning for 2 hours.", "Yesterday 10:05 AM", false, isRead = true),
+            Message("m7", "c2", "I've arrived at the location.", "Yesterday 10:30 AM", false, isRead = true)
+        ),
+        "c3" to listOf(
+            Message("m8", "c3", "Carol, the cleaning was absolutely amazing!", "2 days ago 03:00 PM", true, isRead = true),
+            Message("m9", "c3", "Thank you so much! It was a pleasure working with you.", "2 days ago 03:15 PM", false, isRead = true),
+            Message("m10", "c3", "Thank you for the wonderful review! 😊", "2 days ago 03:20 PM", false, isRead = true)
+        )
     )
+
+    // Convenience accessor — falls back to empty list for unknown chat IDs
+    val messages = messagesByChatId["c1"] ?: emptyList()
 
     val notifications = listOf(
         AppNotification("n1", "Booking Confirmed", "Your booking with Alice Johnson has been confirmed for tomorrow at 10:00 AM.", NotificationType.BOOKING_CONFIRMED, "2 hours ago"),

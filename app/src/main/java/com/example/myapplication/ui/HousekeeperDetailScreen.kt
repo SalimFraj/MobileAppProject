@@ -33,7 +33,7 @@ fun HousekeeperDetailScreen(
     housekeeper: Housekeeper,
     viewModel: MainViewModel,
     onBack: () -> Unit,
-    onHire: () -> Unit
+    onHire: (dateTime: String, service: String, hours: Int) -> Unit
 ) {
     val favorites by viewModel.favorites.collectAsState()
     val isFavorite = favorites.contains(housekeeper.id)
@@ -325,9 +325,9 @@ fun HousekeeperDetailScreen(
         ) {
             BookingCheckoutSheet(
                 housekeeper = housekeeper,
-                onConfirm = { date, _, duration ->
+                onConfirm = { date, service, duration ->
                     viewModel.bookHousekeeper(housekeeper, date, duration)
-                    onHire()
+                    onHire(date, service, duration)
                     showBookingSheet = false
                 },
                 onDismiss = { showBookingSheet = false }

@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.data.MockData
 import com.example.myapplication.model.Chat
 import com.example.myapplication.model.Housekeeper
 import com.example.myapplication.ui.*
@@ -90,6 +91,9 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
     var selectedHousekeeper by remember { mutableStateOf<Housekeeper?>(null) }
     var selectedChat by remember { mutableStateOf<Chat?>(null) }
     var hasCompletedOnboarding by rememberSaveable { mutableStateOf(false) }
+    // Holds real data from the last completed booking
+    data class BookingSummary(val name: String, val dateTime: String, val hours: Int, val service: String)
+    var lastBooking by remember { mutableStateOf<BookingSummary?>(null) }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -150,7 +154,23 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
                 )
             }
             composable(Screen.Bookings.route) {
-                BookingScreen(viewModel = viewModel)
+                BookingScreen(
+                    viewModel = viewModel,
+                    onChat = { housekeeperId ->
+                        // Match the housekeeper to a chat by housekeeperId (c1=housekeeper 1, etc.)
+                        val chatId = "c$housekeeperId"
+                        val matchingChat = MockData.chats.find { it.id == chatId }
+                        if (matchingChat != null) {
+                            selectedChat = matchingChat
+                            navController.navigate(Screen.ChatDetail.route)
+                        } else {
+                            // Fallback: go to Messages tab
+                            navController.navigate(Screen.Messages.route) {
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                )
             }
             composable(Screen.Messages.route) {
                 ChatScreen(
@@ -185,9 +205,11 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
                         housekeeper = housekeeper,
                         viewModel = viewModel,
                         onBack = { navController.popBackStack() },
-                        onHire = {
+                        onHire = { dateTime, service, hours ->
+                            lastBooking = BookingSummary(housekeeper.name, dateTime, hours, service)
                             navController.navigate(Screen.Success.route) {
-                                popUpTo(Screen.Home.route)
+                                popUpTo(Screen.Home.route) { inclusive = false }
+                                launchSingleTop = true
                             }
                         }
                     )
@@ -214,12 +236,15 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
                 SubscriptionScreen(onBack = { navController.popBackStack() })
             }
             composable(Screen.Success.route) {
-                SuccessBookingScreen(onDismiss = {
-                    navController.navigate(Screen.Bookings.route) {
-                        popUpTo(Screen.Home.route) { saveState = true }
-                        launchSingleTop = true
+                SuccessBookingScreen(
+                    housekeeperName = lastBooking?.name ?: "",
+                    dateTime = lastBooking?.dateTime ?: "",
+                    durationHours = lastBooking?.hours ?: 0,
+                    serviceName = lastBooking?.service ?: "",
+                    onDismiss = {
+                        navController.popBackStack(Screen.Home.route, inclusive = false)
                     }
-                })
+                )
             }
         }
     }

@@ -26,7 +26,13 @@ import com.example.myapplication.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
-fun SuccessBookingScreen(onDismiss: () -> Unit) {
+fun SuccessBookingScreen(
+    housekeeperName: String = "",
+    dateTime: String = "",
+    durationHours: Int = 0,
+    serviceName: String = "",
+    onDismiss: () -> Unit
+) {
     var showConfetti by remember { mutableStateOf(false) }
     var showContent by remember { mutableStateOf(false) }
     
@@ -68,6 +74,21 @@ fun SuccessBookingScreen(onDismiss: () -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 particleCount = 150,
                 durationMillis = 4000
+            )
+        }
+
+        // Close (X) button — top-right corner
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(8.dp)
+        ) {
+            Icon(
+                Icons.Default.Close,
+                contentDescription = "Close",
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -126,7 +147,7 @@ fun SuccessBookingScreen(onDismiss: () -> Unit) {
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "Tomorrow, 10:00 AM",
+                            if (dateTime.isNotBlank()) dateTime else "—",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -140,7 +161,11 @@ fun SuccessBookingScreen(onDismiss: () -> Unit) {
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "3 hours - Deep Clean",
+                            buildString {
+                                if (durationHours > 0) append("$durationHours hour${if (durationHours > 1) "s" else ""} ")
+                                if (serviceName.isNotBlank()) append("- $serviceName")
+                                if (isEmpty()) append("—")
+                            },
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -153,7 +178,7 @@ fun SuccessBookingScreen(onDismiss: () -> Unit) {
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "Home Address",
+                            if (housekeeperName.isNotBlank()) housekeeperName else "Your housekeeper",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

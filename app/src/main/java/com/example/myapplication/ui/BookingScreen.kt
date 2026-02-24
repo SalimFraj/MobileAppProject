@@ -38,7 +38,8 @@ import com.example.myapplication.ui.theme.*
 @Composable
 fun BookingScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    onChat: (housekeeperId: String) -> Unit = {}
 ) {
     val bookings by viewModel.myBookings.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
@@ -122,7 +123,8 @@ fun BookingScreen(
                                 booking = booking,
                                 onRebook = { viewModel.rebookFromHistory(booking) },
                                 onRate = { rating -> viewModel.rateBooking(booking.id, rating) },
-                                onCancel = { viewModel.cancelBooking(booking.id) }
+                                onCancel = { viewModel.cancelBooking(booking.id) },
+                                onChat = { onChat(booking.housekeeperId) }
                             )
                         }
                     }
@@ -137,7 +139,8 @@ fun EnhancedBookingCard(
     booking: Booking,
     onRebook: () -> Unit,
     onRate: (Int) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onChat: () -> Unit = {}
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var showRatingDialog by remember { mutableStateOf(false) }
@@ -297,7 +300,10 @@ fun EnhancedBookingCard(
                     when (booking.status) {
                         BookingStatus.CONFIRMED, BookingStatus.ON_WAY -> {
                             Button(
-                                onClick = { },
+                                onClick = {
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onChat()
+                                },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primary
