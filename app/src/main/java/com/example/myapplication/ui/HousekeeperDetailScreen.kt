@@ -41,31 +41,6 @@ fun HousekeeperDetailScreen(
     val sheetState = rememberModalBottomSheetState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Provider Profile", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.toggleFavorite(housekeeper.id) }) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Favorite",
-                            tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    IconButton(onClick = { /* Share */ }) {
-                        Icon(Icons.Default.Share, contentDescription = "Share")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
         bottomBar = {
             Surface(
                 tonalElevation = 8.dp,
@@ -119,38 +94,76 @@ fun HousekeeperDetailScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(bottom = innerPadding.calculateBottomPadding())
                 .verticalScroll(scrollState)
         ) {
-            // Hero Image with Parallax Effect
-            Box(modifier = Modifier.height(400.dp)) {
+            // Hero Image — no parallax to avoid text overlap
+            Box(
+                modifier = Modifier
+                    .height(350.dp)
+                    .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+            ) {
                 AsyncImage(
                     model = housekeeper.imageUrl,
                     contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            // Parallax effect: image moves slower than scroll
-                            translationY = scrollState.value * 0.5f
-                            // Slight scale up as you scroll for depth
-                            scaleX = 1f + (scrollState.value * 0.0003f).coerceAtMost(0.1f)
-                            scaleY = 1f + (scrollState.value * 0.0003f).coerceAtMost(0.1f)
-                        },
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
+                // Gradient overlay
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
-                                    Color.Black.copy(alpha = 0.4f),
+                                    Color.Black.copy(alpha = 0.5f),
                                     Color.Transparent,
-                                    Color.Black.copy(alpha = 0.6f)
+                                    Color.Black.copy(alpha = 0.4f)
                                 )
                             )
                         )
                 )
-                
+
+                // Overlay action buttons on top of image
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White)
+                    }
+
+                    Row {
+                        IconButton(
+                            onClick = { viewModel.toggleFavorite(housekeeper.id) },
+                            modifier = Modifier
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Favorite",
+                                tint = if (isFavorite) Color(0xFFFF6B6B) else Color.White
+                            )
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        IconButton(
+                            onClick = { /* Share */ },
+                            modifier = Modifier
+                                .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+                        ) {
+                            Icon(Icons.Default.Share, "Share", tint = Color.White)
+                        }
+                    }
+                }
+
                 // Location Badge
                 Surface(
                     modifier = Modifier

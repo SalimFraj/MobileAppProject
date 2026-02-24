@@ -40,7 +40,7 @@ fun BookingCheckoutSheet(
     housekeeper: Housekeeper,
     onConfirm: (String, String, Int) -> Unit,
     onDismiss: () -> Unit,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel = viewModel(factory = MainViewModel.Factory)
 ) {
     var selectedDate by remember { mutableStateOf(MockData.nextSevenDays.first()) }
     var selectedTime by remember { mutableStateOf<TimeSlot?>(MockData.timeSlots.first { it.isAvailable }) }
