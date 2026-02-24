@@ -130,30 +130,14 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
             }
         },
         topBar = {
-            if (currentRoute == Screen.Home.route) {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            "HouseKeep",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    },
-                    actions = {
-                        IconButton(onClick = { navController.navigate(Screen.Notifications.route) }) {
-                            BadgedBox(badge = { Badge { Text("3") } }) {
-                                Icon(Icons.Default.NotificationsNone, "Notifications")
-                            }
-                        }
-                    }
-                )
-            }
+            // HousekeeperListScreen manages its own collapsing header,
+            // so no top bar is needed here for the Home route.
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             // ── Main Tabs ──
             composable(Screen.Home.route) {

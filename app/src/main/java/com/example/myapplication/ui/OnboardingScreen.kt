@@ -36,7 +36,7 @@ val onboardingPages = listOf(
     OnboardingPage(
         "Find the Best Helpers",
         "Browse through hundreds of verified and top-rated housekeepers in your neighborhood.",
-        "https://images.unsplash.com/photo-1581578731548-c64695ce6958?q=80&w=2070&auto=format&fit=crop"
+        "https://images.unsplash.com/photo-1528740561666-dc2479dc08ab?q=80&w=2000&auto=format&fit=crop"
     ),
     OnboardingPage(
         "Book in Seconds",
