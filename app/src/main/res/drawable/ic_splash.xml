@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Sparkle/broom icon representing cleaning -->
+    <group
+        android:translateX="22"
+        android:translateY="22">
+        
+        <!-- House outline -->
+        <path
+            android:pathData="M32,12L6,32V60H58V32L32,12Z"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.95"/>
+            
+        <!-- Roof -->
+        <path
+            android:pathData="M32,6L0,30L6,36L32,14L58,36L64,30L32,6Z"
+            android:fillColor="#FFFFFF"/>
+            
+        <!-- Sparkle effects -->
+        <path
+            android:pathData="M50,8L52,16L60,18L52,20L50,28L48,20L40,18L48,16Z"
+            android:fillColor="#FBBF24"/>
+            
+        <path
+            android:pathData="M12,4L13,8L17,9L13,10L12,14L11,10L7,9L11,8Z"
+            android:fillColor="#FBBF24"/>
+            
+        <!-- Window -->
+        <path
+            android:pathData="M24,36H40V52H24V36Z"
+            android:fillColor="#6366F1"/>
+            
+        <!-- Window cross -->
+        <path
+            android:pathData="M31,36V52M24,44H40"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="2"/>
+    </group>
+</vector>

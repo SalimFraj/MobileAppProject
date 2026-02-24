@@ -1,0 +1,172 @@
+<resources>
+    <string name="app_name">HouseKeep</string>
+    
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Find Housekeepers</string>
+    <string name="onboarding_title_2">Book Easily</string>
+    <string name="onboarding_title_3">Enjoy Cleanliness</string>
+    <string name="onboarding_desc_1">Discover verified and trusted housekeeping professionals in your area</string>
+    <string name="onboarding_desc_2">Schedule services at your convenience with just a few taps</string>
+    <string name="onboarding_desc_3">Relax while your home gets the care it deserves</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="get_started">Get Started</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_bookings">Bookings</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_profile">Profile</string>
+    
+    <!-- Home Screen -->
+    <string name="search_placeholder">Search housekeepers…</string>
+    <string name="category_all">All</string>
+    <string name="featured_housekeepers">Featured Housekeepers</string>
+    <string name="nearby_providers">Nearby Providers</string>
+    <string name="no_results">No housekeepers found</string>
+    <string name="try_different_search">Try a different search or category</string>
+    
+    <!-- Housekeeper Card -->
+    <string name="per_hour">/hr</string>
+    <string name="verified">Verified</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
+    
+    <!-- Housekeeper Detail -->
+    <string name="provider_profile">Provider Profile</string>
+    <string name="about">About</string>
+    <string name="services">Services</string>
+    <string name="reviews">Reviews</string>
+    <string name="see_all_reviews">See all reviews</string>
+    <string name="book_now">Book Now</string>
+    <string name="estimated_cost">Estimated Cost</string>
+    <string name="share_profile">Share Profile</string>
+    
+    <!-- Booking -->
+    <string name="book_session">Book Session</string>
+    <string name="select_date">Select Date</string>
+    <string name="select_time">Select Time</string>
+    <string name="duration">Duration</string>
+    <string name="hours">hours</string>
+    <string name="payment_method">Payment Method</string>
+    <string name="promo_code">Promo Code</string>
+    <string name="enter_promo_code">Enter promo code</string>
+    <string name="apply">Apply</string>
+    <string name="add_tip">Add a Tip</string>
+    <string name="special_instructions">Special Instructions</string>
+    <string name="price_breakdown">Price Breakdown</string>
+    <string name="base_price">Base Price</string>
+    <string name="service_fee">Service Fee</string>
+    <string name="total">Total</string>
+    <string name="confirm_pay">Confirm &amp; Pay</string>
+    <string name="service_packages">Service Packages</string>
+    <string name="popular">Popular</string>
+    
+    <!-- Booking Success -->
+    <string name="booking_confirmed">Booking Confirmed! 🎉</string>
+    <string name="booking_confirmed_desc">Your housekeeper has been notified and will arrive at the scheduled time.</string>
+    <string name="loyalty_points_earned">+25 loyalty points earned!</string>
+    <string name="view_my_bookings">View My Bookings</string>
+    <string name="add_to_calendar">Add to Calendar</string>
+    
+    <!-- Bookings Screen -->
+    <string name="my_bookings">My Bookings</string>
+    <string name="active">Active</string>
+    <string name="completed">Completed</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="no_active_bookings">No active bookings</string>
+    <string name="no_completed_bookings">No completed bookings</string>
+    <string name="no_cancelled_bookings">No cancelled bookings</string>
+    <string name="rebook">Rebook</string>
+    <string name="cancel_booking">Cancel Booking</string>
+    <string name="rate_experience">Rate your experience</string>
+    <string name="earn_bonus_points">Earn 10 bonus points!</string>
+    
+    <!-- Booking Status -->
+    <string name="status_pending">Pending</string>
+    <string name="status_confirmed">Confirmed</string>
+    <string name="status_on_way">On the way</string>
+    <string name="status_in_progress">In progress</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_cancelled">Cancelled</string>
+    
+    <!-- Chat -->
+    <string name="messages">Messages</string>
+    <string name="search_conversations">Search conversations</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="typing">typing…</string>
+    <string name="type_message">Type a message…</string>
+    <string name="send">Send</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    
+    <!-- Profile -->
+    <string name="profile">Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="loyalty_points">Loyalty Points</string>
+    <string name="rewards">Rewards</string>
+    <string name="refer_earn">Refer &amp; Earn $25</string>
+    <string name="your_code">Your code:</string>
+    <string name="share">Share</string>
+    <string name="housekeep_plus">HouseKeep Plus</string>
+    <string name="save_on_services">Save 30% on all services</string>
+    
+    <!-- Settings -->
+    <string name="preferences">Preferences</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="notifications">Notifications</string>
+    <string name="language">Language</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="personal_info">Personal Information</string>
+    <string name="my_wallet">My Wallet</string>
+    <string name="saved_addresses">Saved Addresses</string>
+    <string name="payment_methods">Payment Methods</string>
+    <string name="rewards_referrals">Rewards &amp; Referrals</string>
+    <string name="loyalty_rewards">Loyalty Rewards</string>
+    <string name="refer_friend">Refer a Friend</string>
+    <string name="gift_cards">Gift Cards</string>
+    <string name="support_legal">Support &amp; Legal</string>
+    <string name="help_center">Help Center</string>
+    <string name="chat_support">Chat with Support</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="about_housekeep">About HouseKeep</string>
+    <string name="logout">Logout</string>
+    
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="no_notifications">No notifications yet</string>
+    
+    <!-- Favorites -->
+    <string name="favorites">Favorites</string>
+    <string name="no_favorites">No favorites yet</string>
+    <string name="add_favorites_hint">Tap the heart icon on any housekeeper to save them here</string>
+    
+    <!-- Wallet -->
+    <string name="wallet">Wallet</string>
+    <string name="balance">Balance</string>
+    <string name="add_funds">Add Funds</string>
+    <string name="transaction_history">Transaction History</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">No internet connection</string>
+    <string name="error_promo_invalid">Invalid promo code</string>
+    <string name="error_promo_used">This promo code has already been used</string>
+    <string name="error_promo_min_amount">Minimum order amount not met</string>
+    
+    <!-- Accessibility -->
+    <string name="cd_back">Go back</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_filter">Filter</string>
+    <string name="cd_share">Share</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_profile_picture">Profile picture</string>
+    <string name="cd_rating">Rating</string>
+    <string name="cd_price">Price</string>
+</resources>
