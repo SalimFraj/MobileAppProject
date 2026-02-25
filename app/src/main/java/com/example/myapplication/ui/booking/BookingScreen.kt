@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.booking
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -38,7 +38,7 @@ import com.example.myapplication.ui.theme.*
 @Composable
 fun BookingScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
+    viewModel: BookingViewModel,
     onChat: (housekeeperId: String) -> Unit = {}
 ) {
     val bookings by viewModel.myBookings.collectAsState()
@@ -157,7 +157,7 @@ fun EnhancedBookingCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
                     model = booking.housekeeperImageUrl,
-                    contentDescription = null,
+                    contentDescription = booking.housekeeperName,
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape),

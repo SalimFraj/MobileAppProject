@@ -2,7 +2,7 @@ package com.example.myapplication
 
 import com.example.myapplication.data.MockData
 import com.example.myapplication.model.PromoCode
-import com.example.myapplication.ui.HousekeepUiState
+import com.example.myapplication.ui.home.HousekeepUiState
 import org.junit.Test
 import org.junit.Assert.*
 
@@ -109,7 +109,7 @@ class MainViewModelUnitTest {
     @Test
     fun filterHousekeepers_byService_returnsMatchingResults() {
         val allHousekeepers = MockData.housekeepers
-        val targetService = "Cleaning"
+        val targetService = "Standard"
 
         val filtered = allHousekeepers.filter { h ->
             h.services.contains(targetService)

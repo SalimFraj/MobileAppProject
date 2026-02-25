@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,23 +11,28 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentMethodsScreen(onBack: () -> Unit) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Payment Methods", fontWeight = FontWeight.ExtraBold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 }
             )
@@ -35,11 +40,13 @@ fun PaymentMethodsScreen(onBack: () -> Unit) {
         bottomBar = {
             Box(modifier = Modifier.padding(24.dp).navigationBarsPadding()) {
                 Button(
-                    onClick = { },
+                    onClick = {
+                        scope.launch { snackbarHostState.showSnackbar("Add New Card coming soon") }
+                    },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Icon(Icons.Default.Add, null)
+                    Icon(Icons.Default.Add, "Add new card")
                     Spacer(Modifier.width(8.dp))
                     Text("Add New Card", fontWeight = FontWeight.Bold)
                 }
@@ -57,7 +64,7 @@ fun PaymentMethodsScreen(onBack: () -> Unit) {
                 Text("Saved Cards", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
             
-            items(sampleCards) { card ->
+            items(sampleCards, key = { it.lastFour }) { card ->
                 PaymentCardItem(card)
             }
             
@@ -94,7 +101,7 @@ fun PaymentCardItem(card: CreditCard) {
             ) {
                 Icon(
                     Icons.Default.CreditCard,
-                    null,
+                    "Credit card",
                     modifier = Modifier.padding(12.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -121,7 +128,7 @@ fun OtherPaymentItem(icon: androidx.compose.ui.graphics.vector.ImageVector, titl
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+        Icon(icon, title, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         Spacer(Modifier.width(16.dp))
         Column {
             Text(title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)

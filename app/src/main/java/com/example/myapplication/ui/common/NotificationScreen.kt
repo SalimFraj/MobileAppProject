@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -46,7 +46,7 @@ fun NotificationScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                items(MockData.notifications) { notification ->
+                items(MockData.notifications, key = { it.id }) { notification ->
                     NotificationItem(notification)
                     HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                 }
@@ -80,7 +80,7 @@ fun NotificationItem(notification: AppNotification) {
         ) {
             Icon(
                 icon,
-                contentDescription = null,
+                contentDescription = notification.title,
                 modifier = Modifier.padding(10.dp),
                 tint = color
             )

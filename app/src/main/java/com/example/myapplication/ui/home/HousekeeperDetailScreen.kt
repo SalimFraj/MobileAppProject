@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,16 +26,19 @@ import coil.compose.AsyncImage
 import com.example.myapplication.data.MockData
 import com.example.myapplication.model.Housekeeper
 import com.example.myapplication.model.Review
+import com.example.myapplication.ui.booking.BookingCheckoutSheet
+import com.example.myapplication.ui.booking.BookingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HousekeeperDetailScreen(
     housekeeper: Housekeeper,
-    viewModel: MainViewModel,
+    homeViewModel: HomeViewModel,
+    bookingViewModel: BookingViewModel,
     onBack: () -> Unit,
     onHire: (dateTime: String, service: String, hours: Int) -> Unit
 ) {
-    val favorites by viewModel.favorites.collectAsState()
+    val favorites by homeViewModel.favorites.collectAsState()
     val isFavorite = favorites.contains(housekeeper.id)
     var showBookingSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -105,7 +108,7 @@ fun HousekeeperDetailScreen(
             ) {
                 AsyncImage(
                     model = housekeeper.imageUrl,
-                    contentDescription = null,
+                    contentDescription = housekeeper.name,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -143,7 +146,7 @@ fun HousekeeperDetailScreen(
 
                     Row {
                         IconButton(
-                            onClick = { viewModel.toggleFavorite(housekeeper.id) },
+                            onClick = { homeViewModel.toggleFavorite(housekeeper.id) },
                             modifier = Modifier
                                 .background(Color.Black.copy(alpha = 0.3f), CircleShape)
                         ) {
@@ -326,7 +329,7 @@ fun HousekeeperDetailScreen(
             BookingCheckoutSheet(
                 housekeeper = housekeeper,
                 onConfirm = { date, service, duration ->
-                    viewModel.bookHousekeeper(housekeeper, date, duration)
+                    bookingViewModel.bookHousekeeper(housekeeper, date, duration)
                     onHire(date, service, duration)
                     showBookingSheet = false
                 },
@@ -373,7 +376,7 @@ fun ReviewItem(review: Review) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
                     model = review.userImageUrl,
-                    contentDescription = null,
+                    contentDescription = "${review.userName}'s photo",
                     modifier = Modifier
                         .size(44.dp)
                         .clip(CircleShape),

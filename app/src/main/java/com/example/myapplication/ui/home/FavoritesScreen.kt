@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +19,7 @@ import com.example.myapplication.ui.components.HousekeeperCard
 @Composable
 fun FavoritesScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel,
     onHousekeeperClick: (Housekeeper) -> Unit
 ) {
     val favorites by viewModel.favorites.collectAsState()
@@ -43,7 +43,7 @@ fun FavoritesScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(favoriteHousekeepers) { housekeeper ->
+                items(favoriteHousekeepers, key = { it.id }) { housekeeper ->
                     HousekeeperCard(
                         housekeeper = housekeeper,
                         isFavorite = true,

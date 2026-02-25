@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,7 +69,7 @@ fun ChatScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                items(filteredChats) { chat ->
+                items(filteredChats, key = { it.id }) { chat ->
                     ChatItem(chat = chat, onClick = { onChatClick(chat) })
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 72.dp),
@@ -94,7 +94,7 @@ fun ChatItem(chat: Chat, onClick: () -> Unit) {
         Box {
             AsyncImage(
                 model = chat.participantImageUrl,
-                contentDescription = null,
+                contentDescription = chat.participantName,
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape),

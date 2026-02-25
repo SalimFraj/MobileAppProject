@@ -1,26 +1,22 @@
 package com.example.myapplication
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.*
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -31,7 +27,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.data.MockData
 import com.example.myapplication.model.Chat
 import com.example.myapplication.model.Housekeeper
-import com.example.myapplication.ui.*
+import com.example.myapplication.ui.home.*
+import com.example.myapplication.ui.booking.*
+import com.example.myapplication.ui.profile.*
+import com.example.myapplication.ui.chat.*
+import com.example.myapplication.ui.common.*
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 /**
@@ -51,7 +51,18 @@ sealed class Screen(val route: String) {
     data object Addresses : Screen("addresses")
     data object Subscription : Screen("subscription")
     data object Success : Screen("success")
+    data object Settings : Screen("settings")
 }
+
+/**
+ * Summary of a completed booking, used to pass data to the success screen.
+ */
+data class BookingSummary(
+    val name: String,
+    val dateTime: String,
+    val hours: Int,
+    val service: String
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,8 +74,10 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val viewModel: MainViewModel = viewModel(factory = MainViewModel.Factory)
-            val isDarkMode by viewModel.isDarkMode.collectAsState()
+            val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory)
+            val bookingViewModel: BookingViewModel = viewModel(factory = BookingViewModel.Factory)
+            val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
+            val isDarkMode by profileViewModel.isDarkMode.collectAsState()
 
             LaunchedEffect(Unit) {
                 kotlinx.coroutines.delay(500)
@@ -79,7 +92,7 @@ class MainActivity : ComponentActivity() {
 
             MyApplicationTheme(darkTheme = useDarkTheme) {
                 val navController = rememberNavController()
-                HouseKeepApp(viewModel, navController)
+                HouseKeepApp(homeViewModel, bookingViewModel, profileViewModel, navController)
             }
         }
     }
@@ -87,12 +100,13 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
+fun HouseKeepApp(homeViewModel: HomeViewModel, bookingViewModel: BookingViewModel, profileViewModel: ProfileViewModel, navController: NavHostController) {
     var selectedHousekeeper by remember { mutableStateOf<Housekeeper?>(null) }
     var selectedChat by remember { mutableStateOf<Chat?>(null) }
-    var hasCompletedOnboarding by rememberSaveable { mutableStateOf(false) }
+    // Persistent onboarding via DataStore
+    val preferences by profileViewModel.preferences.collectAsState()
+    val hasCompletedOnboarding = preferences.hasCompletedOnboarding
     // Holds real data from the last completed booking
-    data class BookingSummary(val name: String, val dateTime: String, val hours: Int, val service: String)
     var lastBooking by remember { mutableStateOf<BookingSummary?>(null) }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -105,7 +119,7 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
     val isOnMainTab = currentRoute in mainTabRoutes || currentRoute == null
 
     if (!hasCompletedOnboarding) {
-        OnboardingScreen(onFinished = { hasCompletedOnboarding = true })
+        OnboardingScreen(onFinished = { profileViewModel.completeOnboarding() })
         return
     }
 
@@ -116,6 +130,7 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
                 NavigationBar {
                     AppDestinations.entries.forEach { dest ->
                         NavigationBarItem(
+                            modifier = Modifier.testTag("nav_${dest.route}"),
                             icon = { Icon(dest.icon, contentDescription = dest.label) },
                             label = { Text(dest.label) },
                             selected = currentRoute == dest.route,
@@ -146,7 +161,7 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
             // ── Main Tabs ──
             composable(Screen.Home.route) {
                 HousekeeperListScreen(
-                    viewModel = viewModel,
+                    viewModel = homeViewModel,
                     onHousekeeperClick = {
                         selectedHousekeeper = it
                         navController.navigate(Screen.HousekeeperDetail.route)
@@ -155,7 +170,7 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
             }
             composable(Screen.Bookings.route) {
                 BookingScreen(
-                    viewModel = viewModel,
+                    viewModel = bookingViewModel,
                     onChat = { housekeeperId ->
                         // Match the housekeeper to a chat by housekeeperId (c1=housekeeper 1, etc.)
                         val chatId = "c$housekeeperId"
@@ -182,7 +197,7 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
             }
             composable(Screen.Favorites.route) {
                 FavoritesScreen(
-                    viewModel = viewModel,
+                    viewModel = homeViewModel,
                     onHousekeeperClick = {
                         selectedHousekeeper = it
                         navController.navigate(Screen.HousekeeperDetail.route)
@@ -191,10 +206,17 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(
-                    viewModel = viewModel,
+                    profileViewModel = profileViewModel,
+                    bookingViewModel = bookingViewModel,
                     onWalletClick = { navController.navigate(Screen.Wallet.route) },
                     onAddressesClick = { navController.navigate(Screen.Addresses.route) },
-                    onSubscriptionClick = { navController.navigate(Screen.Subscription.route) }
+                    onSubscriptionClick = { navController.navigate(Screen.Subscription.route) },
+                    onSettingsClick = { navController.navigate(Screen.Settings.route) },
+                    onLogout = {
+                        navController.navigate(Screen.Onboarding.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
                 )
             }
 
@@ -203,7 +225,8 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
                 selectedHousekeeper?.let { housekeeper ->
                     HousekeeperDetailScreen(
                         housekeeper = housekeeper,
-                        viewModel = viewModel,
+                        homeViewModel = homeViewModel,
+                        bookingViewModel = bookingViewModel,
                         onBack = { navController.popBackStack() },
                         onHire = { dateTime, service, hours ->
                             lastBooking = BookingSummary(housekeeper.name, dateTime, hours, service)
@@ -227,10 +250,23 @@ fun HouseKeepApp(viewModel: MainViewModel, navController: NavHostController) {
                 NotificationScreen(onBack = { navController.popBackStack() })
             }
             composable(Screen.Wallet.route) {
-                WalletScreen(onBack = { navController.popBackStack() })
+                WalletScreen(
+                    profileViewModel = profileViewModel,
+                    bookingViewModel = bookingViewModel,
+                    onBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.Addresses.route) {
-                AddressManagementScreen(onBack = { navController.popBackStack() })
+                AddressManagementScreen(
+                    viewModel = profileViewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    profileViewModel = profileViewModel,
+                    onBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.Subscription.route) {
                 SubscriptionScreen(onBack = { navController.popBackStack() })

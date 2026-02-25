@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.booking
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -24,6 +24,7 @@ import com.example.myapplication.ui.components.AnimatedCheckmark
 import com.example.myapplication.ui.components.ConfettiAnimation
 import com.example.myapplication.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SuccessBookingScreen(
@@ -33,6 +34,8 @@ fun SuccessBookingScreen(
     serviceName: String = "",
     onDismiss: () -> Unit
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     var showConfetti by remember { mutableStateOf(false) }
     var showContent by remember { mutableStateOf(false) }
     
@@ -239,7 +242,9 @@ fun SuccessBookingScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedButton(
-                    onClick = { /* Add to calendar */ },
+                    onClick = {
+                        scope.launch { snackbarHostState.showSnackbar("Add to Calendar coming soon") }
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
@@ -250,7 +255,9 @@ fun SuccessBookingScreen(
                     Text("Calendar", fontSize = 14.sp)
                 }
                 OutlinedButton(
-                    onClick = { /* Share */ },
+                    onClick = {
+                        scope.launch { snackbarHostState.showSnackbar("Share coming soon") }
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),

@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.chat
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -39,6 +39,7 @@ import com.example.myapplication.model.MessageType
 import com.example.myapplication.ui.components.TypingIndicator
 import com.example.myapplication.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 data class MessageGroup(
     val date: String,
@@ -57,6 +58,8 @@ fun ChatDetailScreen(
     var showReactionPicker by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
     val listState = rememberLazyListState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     // ── Per-chat mutable message list (fix #1 + #2) ──
     val messages = remember(chat.id) {
@@ -170,10 +173,14 @@ fun ChatDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        scope.launch { snackbarHostState.showSnackbar("Call coming soon") }
+                    }) {
                         Icon(Icons.Default.Call, contentDescription = "Call")
                     }
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        scope.launch { snackbarHostState.showSnackbar("More options coming soon") }
+                    }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More")
                     }
                 },

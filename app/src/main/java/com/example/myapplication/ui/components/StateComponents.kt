@@ -39,7 +39,7 @@ fun EmptyState(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = title,
             modifier = Modifier.size(100.dp),
             tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
         )
@@ -97,7 +97,7 @@ fun ErrorState(
         ) {
             Icon(
                 imageVector = Icons.Default.ErrorOutline,
-                contentDescription = null,
+                contentDescription = "Error",
                 modifier = Modifier
                     .size(80.dp)
                     .padding(20.dp),
@@ -155,7 +155,7 @@ fun NoNetworkState(
     ) {
         Icon(
             imageVector = Icons.Default.WifiOff,
-            contentDescription = null,
+            contentDescription = "No network connection",
             modifier = Modifier.size(100.dp),
             tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
         )

@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.home
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HousekeeperListScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel,
     onHousekeeperClick: (Housekeeper) -> Unit
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -366,7 +366,7 @@ fun SimulatedMapView(padding: PaddingValues, onHousekeeperClick: (Housekeeper) -
             ) {
                 AsyncImage(
                     model = h.imageUrl,
-                    contentDescription = null,
+                    contentDescription = h.name,
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -456,7 +456,7 @@ fun CategoryTabs(selectedCategory: String, onCategorySelected: (String) -> Unit)
         contentPadding = PaddingValues(horizontal = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(MockData.categories) { category ->
+        items(MockData.categories, key = { it }) { category ->
             val isSelected = selectedCategory == category
             Surface(
                 onClick = { 

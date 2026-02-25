@@ -10,36 +10,48 @@ import kotlinx.coroutines.flow.*
  * over local and mock data sources.
  */
 class HousekeeperRepository(private val database: AppDatabase) {
-    
+
     private val bookingDao = database.bookingDao()
     private val favoriteDao = database.favoriteDao()
     private val addressDao = database.addressDao()
     private val userDao = database.userDao()
+    private val promoCodeDao = database.promoCodeDao()
 
-    // Housekeepers with simulated network delay
+    // ── Housekeepers ──
+
+    /** Synchronous access to all housekeepers (currently MockData). */
+    fun getHousekeepersSync(): List<Housekeeper> = MockData.housekeepers
+
+    /** Featured housekeepers filtered by high rating. */
+    fun getFeaturedHousekeepers(): List<Housekeeper> =
+        MockData.housekeepers.filter { it.rating >= 4.8f }.sortedByDescending { it.reviewCount }
+
+    /** Find a housekeeper by ID. */
+    fun getHousekeeperById(id: String): Housekeeper? =
+        MockData.housekeepers.find { it.id == id }
+
+    /** Housekeepers with simulated network delay. */
     fun getHousekeepers(): Flow<Resource<List<Housekeeper>>> = flow {
         emit(Resource.Loading)
-        delay(300) // Simulated network latency
+        delay(300)
         emit(Resource.Success(MockData.housekeepers))
     }
 
     fun searchHousekeepers(query: String): Flow<Resource<List<Housekeeper>>> = flow {
         emit(Resource.Loading)
         delay(200)
-        val results = MockData.housekeepers.filter { 
+        val results = MockData.housekeepers.filter {
             it.name.contains(query, ignoreCase = true) ||
             it.services.any { s -> s.contains(query, ignoreCase = true) }
         }
         emit(Resource.Success(results))
     }
 
-    fun getHousekeeperById(id: String): Flow<Resource<Housekeeper?>> = flow {
-        emit(Resource.Loading)
-        delay(100)
-        emit(Resource.Success(MockData.housekeepers.find { it.id == id }))
-    }
+    // ── Bookings ──
 
-    // Bookings
+    /** Raw entity flow for ViewModel-level mapping. */
+    fun getAllBookingsRaw(): Flow<List<BookingEntity>> = bookingDao.getAllBookings()
+
     fun getAllBookings(): Flow<List<Booking>> = bookingDao.getAllBookings()
         .map { entities ->
             entities.map { entity ->
@@ -71,7 +83,8 @@ class HousekeeperRepository(private val database: AppDatabase) {
         bookingDao.updateRating(bookingId, rating)
     }
 
-    // Favorites
+    // ── Favorites ──
+
     fun getAllFavorites(): Flow<Set<String>> = favoriteDao.getAllFavorites()
         .map { entities -> entities.map { it.housekeeperId }.toSet() }
 
@@ -84,7 +97,8 @@ class HousekeeperRepository(private val database: AppDatabase) {
         }
     }
 
-    // Addresses
+    // ── Addresses ──
+
     fun getAllAddresses(): Flow<List<AddressEntity>> = addressDao.getAllAddresses()
 
     suspend fun insertAddress(address: AddressEntity) {
@@ -100,25 +114,41 @@ class HousekeeperRepository(private val database: AppDatabase) {
         addressDao.setDefaultAddress(addressId)
     }
 
-    // User Profile
+    // ── User Profile ──
+
     fun getUserProfile(): Flow<UserProfileEntity?> = userDao.getUserProfile()
 
     suspend fun updateUserProfile(profile: UserProfileEntity) {
         userDao.insertOrUpdate(profile)
     }
 
-    // Promo Codes
-    fun validatePromoCode(code: String): PromoCode? {
-        return MockData.promoCodes.find { 
-            it.code.equals(code, ignoreCase = true) && it.isValid 
+    suspend fun addLoyaltyPoints(points: Int) {
+        userDao.addLoyaltyPoints(points)
+    }
+
+    // ── Promo Codes ──
+
+    fun findPromoCode(code: String): PromoCode? {
+        return MockData.promoCodes.find {
+            it.code.equals(code, ignoreCase = true) && it.isValid
         }
     }
 
-    // Reviews
+    suspend fun getUsedPromoCode(code: String): UsedPromoCodeEntity? {
+        return promoCodeDao.getUsedPromoCode(code)
+    }
+
+    suspend fun markPromoCodeUsed(code: String) {
+        promoCodeDao.markPromoCodeUsed(UsedPromoCodeEntity(code.uppercase()))
+    }
+
+    // ── Reviews ──
+
     fun getReviewsForHousekeeper(housekeeperId: String): List<Review> {
         return MockData.reviews.filter { it.housekeeperId == housekeeperId }
     }
 
-    // Service Packages
+    // ── Service Packages ──
+
     fun getServicePackages(): List<ServicePackage> = MockData.servicePackages
 }

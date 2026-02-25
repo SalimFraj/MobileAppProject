@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.profile
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -35,21 +35,28 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.myapplication.data.MockData
 import com.example.myapplication.model.UserProfileEntity
+import com.example.myapplication.ui.booking.BookingViewModel
 import com.example.myapplication.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
+    profileViewModel: ProfileViewModel,
+    bookingViewModel: BookingViewModel,
     onWalletClick: () -> Unit,
     onAddressesClick: () -> Unit,
-    onSubscriptionClick: () -> Unit
+    onSubscriptionClick: () -> Unit,
+    onSettingsClick: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
-    val isDarkMode by viewModel.isDarkMode.collectAsState()
-    val userProfile by viewModel.userProfile.collectAsState()
+    val isDarkMode by profileViewModel.isDarkMode.collectAsState()
+    val userProfile by profileViewModel.userProfile.collectAsState()
+    val bookingCount by bookingViewModel.bookingCount.collectAsState()
+    val averageRating by bookingViewModel.averageRating.collectAsState()
     var showEditProfileSheet by remember { mutableStateOf(false) }
     var showReferralDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
     val clipboardManager = LocalClipboardManager.current
     
@@ -60,7 +67,7 @@ fun ProfileScreen(
             TopAppBar(
                 title = { Text("Profile", fontWeight = FontWeight.ExtraBold) },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Default.Settings, "Settings")
                     }
                 },
@@ -143,9 +150,18 @@ fun ProfileScreen(
                         .padding(20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    ProfileStat("12", "Cleanings", Icons.Outlined.CleaningServices)
-                    ProfileStat("4.9", "Avg Rating", Icons.Outlined.Star)
-                    ProfileStat("Gold", "Member", Icons.Outlined.WorkspacePremium)
+                    ProfileStat("$bookingCount", "Cleanings", Icons.Outlined.CleaningServices)
+                    ProfileStat(
+                        if (averageRating > 0f) "%.1f".format(averageRating) else "—",
+                        "Avg Rating", Icons.Outlined.Star
+                    )
+                    val memberTier = when {
+                        loyaltyPoints >= 500 -> "Platinum"
+                        loyaltyPoints >= 250 -> "Gold"
+                        loyaltyPoints >= 100 -> "Silver"
+                        else -> "Bronze"
+                    }
+                    ProfileStat(memberTier, "Member", Icons.Outlined.WorkspacePremium)
                 }
             }
 
@@ -180,7 +196,7 @@ fun ProfileScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             if (isDarkMode == true) Icons.Default.DarkMode else Icons.Default.LightMode,
-                            contentDescription = null,
+                            contentDescription = "Toggle dark mode",
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -197,7 +213,7 @@ fun ProfileScreen(
                         checked = isDarkMode == true,
                         onCheckedChange = { 
                             haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            viewModel.toggleDarkMode() 
+                            profileViewModel.toggleDarkMode() 
                         }
                     )
                 }
@@ -269,7 +285,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             Button(
-                onClick = { /* Logout */ },
+                onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -309,7 +325,36 @@ fun ProfileScreen(
         EditProfileSheet(
             profile = userProfile,
             onDismiss = { showEditProfileSheet = false },
-            onSave = { /* Save profile */ showEditProfileSheet = false }
+            onSave = { name, email, phone ->
+                profileViewModel.updateUserProfile(name, email, phone)
+                showEditProfileSheet = false
+            }
+        )
+    }
+
+    // Logout confirmation dialog
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            icon = { Icon(Icons.Default.Logout, null, tint = ErrorRed) },
+            title = { Text("Logout", textAlign = TextAlign.Center) },
+            text = { Text("Are you sure you want to logout?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        onLogout()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                ) {
+                    Text("Logout")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }
@@ -501,7 +546,7 @@ fun PremiumBanner(onSubscriptionClick: () -> Unit) {
 fun EditProfileSheet(
     profile: UserProfileEntity?,
     onDismiss: () -> Unit,
-    onSave: () -> Unit
+    onSave: (name: String, email: String, phone: String) -> Unit
 ) {
     var name by remember { mutableStateOf(profile?.name ?: "") }
     var email by remember { mutableStateOf(profile?.email ?: "") }
@@ -534,7 +579,7 @@ fun EditProfileSheet(
             ) {
                 AsyncImage(
                     model = profile?.profileImageUrl?.ifEmpty { "https://i.pravatar.cc/300?u=user123" },
-                    contentDescription = null,
+                    contentDescription = "Profile picture",
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape),
@@ -556,6 +601,9 @@ fun EditProfileSheet(
             
             Spacer(Modifier.height(24.dp))
             
+            val isNameValid = name.isNotBlank()
+            val isEmailValid = email.contains("@") && email.contains(".")
+
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -563,7 +611,11 @@ fun EditProfileSheet(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
-                leadingIcon = { Icon(Icons.Outlined.Person, null) }
+                leadingIcon = { Icon(Icons.Outlined.Person, null) },
+                isError = name.isNotEmpty() && !isNameValid,
+                supportingText = if (name.isNotEmpty() && !isNameValid) {
+                    { Text("Name cannot be empty") }
+                } else null
             )
             
             Spacer(Modifier.height(12.dp))
@@ -575,7 +627,11 @@ fun EditProfileSheet(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
-                leadingIcon = { Icon(Icons.Outlined.Email, null) }
+                leadingIcon = { Icon(Icons.Outlined.Email, null) },
+                isError = email.isNotEmpty() && !isEmailValid,
+                supportingText = if (email.isNotEmpty() && !isEmailValid) {
+                    { Text("Please enter a valid email") }
+                } else null
             )
             
             Spacer(Modifier.height(12.dp))
@@ -593,11 +649,12 @@ fun EditProfileSheet(
             Spacer(Modifier.height(32.dp))
             
             Button(
-                onClick = onSave,
+                onClick = { onSave(name.trim(), email.trim(), phone.trim()) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                enabled = isNameValid && isEmailValid
             ) {
                 Text("Save Changes", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
@@ -672,7 +729,7 @@ fun ProfileMenuItem(
         ) {
             Icon(
                 icon, 
-                contentDescription = null, 
+                contentDescription = title, 
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(8.dp)
             )
@@ -690,7 +747,7 @@ fun ProfileMenuItem(
         }
         Icon(
             Icons.AutoMirrored.Filled.KeyboardArrowRight, 
-            contentDescription = null, 
+            contentDescription = "Navigate", 
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

@@ -9,6 +9,7 @@ import com.example.myapplication.data.local.AppDatabase
  */
 interface AppContainer {
     val housekeeperRepository: HousekeeperRepository
+    val userPreferencesRepository: UserPreferencesRepository
 }
 
 /**
@@ -22,5 +23,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val housekeeperRepository: HousekeeperRepository by lazy {
         HousekeeperRepository(database)
+    }
+
+    override val userPreferencesRepository: UserPreferencesRepository by lazy {
+        UserPreferencesRepository(context)
     }
 }

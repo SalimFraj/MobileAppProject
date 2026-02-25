@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.booking
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -40,7 +40,7 @@ fun BookingCheckoutSheet(
     housekeeper: Housekeeper,
     onConfirm: (String, String, Int) -> Unit,
     onDismiss: () -> Unit,
-    viewModel: MainViewModel = viewModel(factory = MainViewModel.Factory)
+    viewModel: BookingViewModel = viewModel(factory = BookingViewModel.Factory)
 ) {
     var selectedDate by remember { mutableStateOf(MockData.nextSevenDays.first()) }
     var selectedTime by remember { mutableStateOf<TimeSlot?>(MockData.timeSlots.first { it.isAvailable }) }
@@ -105,7 +105,7 @@ fun BookingCheckoutSheet(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(MockData.servicePackages) { pkg ->
+                items(MockData.servicePackages, key = { it.name }) { pkg ->
                     ServicePackageCard(
                         name = pkg.name,
                         description = pkg.description,
@@ -127,9 +127,12 @@ fun BookingCheckoutSheet(
             modifier = Modifier.padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(MockData.nextSevenDays) { date ->
+            items(MockData.nextSevenDays, key = { it.time }) { date ->
                 val isSelected = selectedDate == date
-                val isToday = Calendar.getInstance().time.date == date.date
+                val todayCal = Calendar.getInstance()
+                val dateCal = Calendar.getInstance().apply { time = date }
+                val isToday = todayCal.get(Calendar.YEAR) == dateCal.get(Calendar.YEAR)
+                        && todayCal.get(Calendar.DAY_OF_YEAR) == dateCal.get(Calendar.DAY_OF_YEAR)
                 
                 Surface(
                     onClick = { 
@@ -166,7 +169,7 @@ fun BookingCheckoutSheet(
             modifier = Modifier.padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(MockData.timeSlots) { slot ->
+            items(MockData.timeSlots, key = { it.time }) { slot ->
                 val isSelected = selectedTime == slot
                 FilterChip(
                     selected = isSelected,
@@ -346,7 +349,7 @@ fun BookingCheckoutSheet(
             modifier = Modifier.padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(tipOptions) { tip ->
+            items(tipOptions, key = { it }) { tip ->
                 val isSelected = selectedTip == tip
                 FilterChip(
                     selected = isSelected,

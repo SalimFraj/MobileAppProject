@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.common
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -124,7 +124,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                         if (isLast) {
                             Text("Get Started", fontWeight = FontWeight.Bold)
                         } else {
-                            Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
+                            Icon(Icons.AutoMirrored.Filled.ArrowForward, "Next")
                         }
                     }
                 }
@@ -138,7 +138,7 @@ fun OnboardingPagerItem(page: OnboardingPage) {
     Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
             model = page.imageUrl,
-            contentDescription = null,
+            contentDescription = page.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
